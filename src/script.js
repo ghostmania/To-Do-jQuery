@@ -1,10 +1,19 @@
 /**
  * Created by user on 17.03.17.
  */
-$(function (){
+$(function (){ // document ready start
 
-//create li
-    $("button#add_btn").click(function add_element() {
+    $("#input").keypress(function(e){ // add li when press ENTER
+        if (e.keyCode == 13 ) {
+            add_element();
+        }
+    })
+
+    $("button#add_btn").click( // add li when click ADD
+            add_element
+    )
+
+    function add_element() { // create li
 
         var li = $("<li></li>").text($("#input").val()).addClass("Active"); // create li
         li.prepend("<input type='checkbox' />");
@@ -13,8 +22,6 @@ $(function (){
         }));
         $("#list").append(li); // insert created li to list
         $("#input").val("");
-    });
+    }
 
-
-
-})
+}) // document ready end
