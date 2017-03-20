@@ -46,9 +46,9 @@ $(function (){ // document ready start
     function add_element() { // create li
         if ($("#input")[0].value.trim() !== '') { // if input not empty
             var li = $("<li></li>");       // create li
-
             if (allLi + 1 > 3 * currentPage) { // if added element is more then 3rd in list
                 li.hide(); // hide element
+                // renderLi();
             }
             if (allLi%3 == 0 && allLi !== 0){ // create page when needed
                 $("#pages").append($("<button></button>").text(++pageCount));
@@ -84,11 +84,13 @@ $(function (){ // document ready start
                             $("#active_counter").text(--activeLi);
                             $("#completed_counter").text(++completedLi);
                             renderLi();
+                            recountPages();
                         } else { // if currentTab=completed change counters on Active Tab
                             $(this).parent().css("display", "none");
                             $("#active_counter").text(++activeLi);
                             $("#completed_counter").text(--completedLi);
                             renderLi();
+                            recountPages();
                         }
                 })
             );
@@ -97,8 +99,8 @@ $(function (){ // document ready start
                 removePage();
             }));// end remove button
             $("#list").append(li); // insert created li to list
-            $("#input").val("");
-        }
+            $("#input").val(""); // clear input value
+        } // end if input not empty
         $("#all_counter").text(++allLi);
         $("#active_counter").text(++activeLi);
         if (currentTab == 'completed') { // hide li if current tab is Completed
@@ -110,18 +112,21 @@ $(function (){ // document ready start
     function show_all() { // show all elements function
         currentTab = "all";
         renderLi(); // display elements according to  their status
+        recountPages();
         $("#input").focus(); // focus on input
     }
 
     function show_active() { // show active elements function
         currentTab = "active";
         renderLi(); // display elements according to  their status
+        recountPages();
         $("#input").focus(); // focus on input
     }
 
     function show_completed() { // show completed elements function
         currentTab = "completed";
         renderLi(); // display elements according to  their status
+        recountPages();
         $("#input").focus(); // focus on input
     }
 
@@ -138,7 +143,7 @@ $(function (){ // document ready start
             $("#completed_counter").text(--completedLi);// decrease completed elements counter
             renderLi();
         }
-        if (allLi%3 == 0 && allLi !== 0){ // remove page when actual list is empty
+        if (allLi%3 == 0 && allLi !== 0){ // remove page when needed
             $("#pages button:last-child").remove(); // find and remove last button
             --pageCount; //remove page
         }
@@ -162,6 +167,24 @@ $(function (){ // document ready start
             if (completedLi > 3){ // show only 3 elements on page
                 $("li").slice(3).hide(); // show only 3 elements on page
             }
+        }
+    }
+
+    function recountPages() { // recount pages
+        if (currentTab == "active") {
+            pageCount = Math.ceil(activeLi / 3);
+            // if (activeLi == 3 && pageCount > 1){
+            //     $("#pages button:last-child").remove(); // find and remove last button
+            //     --pageCount; //remove page
+            //     currentPage = 1;
+            // }
+        } else { // currentTab = completed
+            pageCount = Math.ceil(completedLi / 3);
+            // if (completedLi == 3 && pageCount > 1){
+            //     $("#pages button:last-child").remove(); // find and remove last button
+            //     --pageCount; //remove page
+            //     currentPage = 1;
+            // }
         }
     }
 
