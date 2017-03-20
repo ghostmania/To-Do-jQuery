@@ -29,7 +29,22 @@ $(function (){ // document ready start
 
     function add_element() { // create li
         if ($("#input")[0].value.trim() !== '') { // if input not empty
-            var li = $("<li></li>").text($("#input").val()); // create li
+            var li = $("<li></li>");       // create li
+            li.append($("<span><span/>").text($("#input").val()).dblclick(
+                function () {
+                    var editInput = $("<input />").keypress(function (e) { // add function to input when press ENTER
+                        if (e.keyCode == 13 ) {
+                            $(this).css("display", "none"); // hide input
+                            $(this).siblings("span").text($(this).val()); // insert value of input into span
+                            $(this).siblings("span").css("display", ""); // show span
+                            $(this).siblings().css("display", ""); // show other elements
+                        }
+                    }); // create input for edit
+                    li.children().hide(); // hide elements when editInput is opened
+                    li.append($(editInput).val($(this).text())); // insert input into li
+                    $(editInput).focus(); // set value of input same as span
+                }
+            ))
             li.prepend($("<input type='checkbox' />").click(function () { // function to sort elements by className
                        $(this).parent().toggleClass("completed"); // when click on checkbox toggle class for li element
                 })
@@ -40,6 +55,7 @@ $(function (){ // document ready start
             $("#list").append(li); // insert created li to list
             $("#input").val("");
         }
+        $("#input").focus();
     }
 
     function show_all() {
