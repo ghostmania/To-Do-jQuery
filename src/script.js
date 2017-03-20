@@ -50,7 +50,7 @@ $(function (){ // document ready start
             if (allLi + 1 > 3 * currentPage) { // if added element is more then 3rd in list
                 li.hide(); // hide element
             }
-            if (allLi%3 == 0 && allLi !== 0){ // create page when actual list is full
+            if (allLi%3 == 0 && allLi !== 0){ // create page when needed
                 $("#pages").append($("<button></button>").text(++pageCount));
             }
             li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
@@ -69,7 +69,7 @@ $(function (){ // document ready start
             ));
             li.prepend($("<input type='checkbox' />").click(function () { // function to sort elements by className
                        $(this).parent().toggleClass("completed"); // when click on checkbox toggle class for li element
-                        if (currentTab == "all") {
+                        if (currentTab == "all") { // change counters on All Tab
                             $(this).parent().css("display", "");
                             if (li[0].className !== 'completed'){
                                 $("#active_counter").text(++activeLi);
@@ -79,31 +79,23 @@ $(function (){ // document ready start
                                 $("#active_counter").text(--activeLi);
                                 $("#completed_counter").text(++completedLi);
                             }
-                        } else if (currentTab == "active"){ // hide elements due to status change
+                        } else if (currentTab == "active"){ // change counters on Active Tab
                             $(this).parent().css("display", "none");
                             $("#active_counter").text(--activeLi);
                             $("#completed_counter").text(++completedLi);
-                        } else { // if currentTab=completed
+                            renderLi();
+                        } else { // if currentTab=completed change counters on Active Tab
                             $(this).parent().css("display", "none");
                             $("#active_counter").text(++activeLi);
                             $("#completed_counter").text(--completedLi);
+                            renderLi();
                         }
                 })
             );
-            li.append($("<button>x</button>").click(function (event) {
+            li.append($("<button>x</button>").click(function (event) { // create remov ebutton
                 $(event.target).parent().detach(); // remove li when click remove btn
-                $("#all_counter").text(--allLi);
-                if (currentTab == "active" || currentTab == 'all') {
-                    $("#active_counter").text(--activeLi);
-                } else if (currentTab == "completed"){
-                    $("#completed_counter").text(--completedLi);
-                }
-                if (allLi%3 == 0 && allLi !== 0){ // remove page when actual list is empty
-                   $("#pages button:last-child").remove();
-                   --pageCount;
-                   // console.log($("#pages button:last-child"));
-                }
-            }));
+                removePage();
+            }));// end remove button
             $("#list").append(li); // insert created li to list
             $("#input").val("");
         }
@@ -115,24 +107,62 @@ $(function (){ // document ready start
         $("#input").focus();
     }
 
-    function show_all() {
+    function show_all() { // show all elements function
         currentTab = "all";
-        $("li").show();
-        $("#input").focus();
+        renderLi(); // display elements according to  their status
+        $("#input").focus(); // focus on input
     }
 
-    function show_active() {
+    function show_active() { // show active elements function
         currentTab = "active";
-        $("li").show();
-        $(".completed").hide();
-        $("#input").focus();
+        renderLi(); // display elements according to  their status
+        $("#input").focus(); // focus on input
     }
 
-    function show_completed() {
+    function show_completed() { // show completed elements function
         currentTab = "completed";
-        $("li").hide();
-        $(".completed").show();
-        $("#input").focus();
+        renderLi(); // display elements according to  their status
+        $("#input").focus(); // focus on input
+    }
+
+    function removePage() {
+        $("#all_counter").text(--allLi); // decrease allCounter
+        if (currentTab == "all") {
+            $("#active_counter").text(--activeLi); // decrease active elements counter
+            renderLi();
+        } else if (currentTab == 'active'){
+            $("#active_counter").text(--activeLi); // decrease active elements counter
+            renderLi();
+        }
+        else if (currentTab == "completed"){
+            $("#completed_counter").text(--completedLi);// decrease completed elements counter
+            renderLi();
+        }
+        if (allLi%3 == 0 && allLi !== 0){ // remove page when actual list is empty
+            $("#pages button:last-child").remove(); // find and remove last button
+            --pageCount; //remove page
+        }
+    }
+
+    function renderLi() {
+        if (currentTab == "all") {
+            $("li").show(); // show all li
+            if (allLi > 3) { // show only 3 elements on page
+                $("li").slice(3).hide();
+            }
+        } else if (currentTab == "active"){
+            $("li").show(); // show li
+            $(".completed").hide(); // hide Completed li
+            if (activeLi > 3){ // show only 3 elements on page
+                $("li").slice(3).hide(); // show only 3 elements on page
+            }
+        } else { // currentTab == completed
+            $("li").hide(); // hide all li
+            $(".completed").show(); // show Completed li
+            if (completedLi > 3){ // show only 3 elements on page
+                $("li").slice(3).hide(); // show only 3 elements on page
+            }
+        }
     }
 
 }) // document ready end
