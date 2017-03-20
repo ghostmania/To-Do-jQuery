@@ -98,6 +98,11 @@ $(function (){ // document ready start
                 } else if (currentTab == "completed"){
                     $("#completed_counter").text(--completedLi);
                 }
+                if (allLi%3 == 0 && allLi !== 0){ // remove page when actual list is empty
+                   $("#pages button:last-child").remove();
+                   --pageCount;
+                   // console.log($("#pages button:last-child"));
+                }
             }));
             $("#list").append(li); // insert created li to list
             $("#input").val("");
