@@ -4,6 +4,8 @@
 $(function (){ // document ready start
         $("#input").focus(); // focus input when page is loaded
 
+        var currentTab = "all";
+
         $("#input").keypress(function(e){ // add li when press ENTER
             if (e.keyCode == 13 ) {
                 add_element();
@@ -47,6 +49,11 @@ $(function (){ // document ready start
             ))
             li.prepend($("<input type='checkbox' />").click(function () { // function to sort elements by className
                        $(this).parent().toggleClass("completed"); // when click on checkbox toggle class for li element
+                        if (currentTab == "all") {
+                            $(this).parent().css("display", "");
+                        } else if (currentTab == "active" || currentTab == "completed"){ // hide elements due to status change
+                            $(this).parent().css("display", "none");
+                        }
                 })
             )
             li.append($("<button>x</button>").click(function (event) {
@@ -59,17 +66,23 @@ $(function (){ // document ready start
     }
 
     function show_all() {
+        currentTab = "all";
         $("li").css("display", "");
+        $("#input").focus();
     }
 
     function show_active() {
+        currentTab = "active";
         $("li").css("display", "");
         $(".completed").css("display", "none");
+        $("#input").focus();
     }
 
     function show_completed() {
+        currentTab = "completed";
         $("li").css("display", "none");
         $(".completed").css("display", "");
+        $("#input").focus();
     }
 
 }) // document ready end
