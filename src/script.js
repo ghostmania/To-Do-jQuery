@@ -8,8 +8,19 @@ $(function (){ // document ready start
         var activeLi = 0;
         var completedLi = 0;
         var allLi = 0;
+        var currentPage = 1;
+        var pageCount = 1;
+        var actualList =[];
+        //pagination
+        $("#container").append($("<section id='pagination'></section>"));
+        $("#pagination").append($("<button id='prev'><</button>"));
+        $("#pagination").append($("<section id='pages'></section>"));
+        $("#pagination").append($("<button id='next'>></button>"));
+        $("#pages").append($("<button>1</button>"));
 
-        $("#input").keypress(function(e){ // add li when press ENTER
+
+
+    $("#input").keypress(function(e){ // add li when press ENTER
             if (e.keyCode == 13 ) {
                 add_element();
             }
@@ -35,7 +46,14 @@ $(function (){ // document ready start
     function add_element() { // create li
         if ($("#input")[0].value.trim() !== '') { // if input not empty
             var li = $("<li></li>");       // create li
-            li.append($("<span><span/>").text($("#input").val()).dblclick(
+
+            if (allLi + 1 > 3 * currentPage) { // if added element is more then 3rd in list
+                li.hide(); // hide element
+            }
+            if (allLi%3 == 0 && allLi !== 0){ // create page when actual list is full
+                $("#pages").append($("<button></button>").text(++pageCount));
+            }
+            li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
                 function () {
                     var editInput = $("<input />").keypress(function (e) { // add function to input when press ENTER
                         if (e.keyCode == 13 ) {

@@ -11,3 +11,9 @@
 #all_counter, #completed_counter, #active_counter {
     padding-left: 5px;
 }
+#pagination{
+    padding-top: 10px;
+}
+#pages{
+    display: inline-block;
+}
