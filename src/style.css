@@ -8,3 +8,6 @@
 .completed{
     text-decoration: line-through;
 }
+#all_counter, #completed_counter, #active_counter {
+    padding-left: 5px;
+}
