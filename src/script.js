@@ -48,10 +48,11 @@ $(function (){ // document ready start
             var li = $("<li></li>");       // create li
             if (allLi + 1 > 3 * currentPage) { // if added element is more then 3rd in list
                 li.hide(); // hide element
-                // renderLi();
             }
             if (allLi%3 == 0 && allLi !== 0){ // create page when needed
-                $("#pages").append($("<button></button>").text(++pageCount));
+                if (currentTab == "all" || currentTab == 'active'){ // create page only when not on Completed Tab
+                    $("#pages").append($("<button></button>").text(++pageCount));
+                }
             }
             li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
                 function () {
@@ -111,6 +112,7 @@ $(function (){ // document ready start
 
     function show_all() { // show all elements function
         currentTab = "all";
+        console.log("You are on All tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
         recountPages();
         $("#input").focus(); // focus on input
@@ -118,6 +120,7 @@ $(function (){ // document ready start
 
     function show_active() { // show active elements function
         currentTab = "active";
+        console.log("You are on Active tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
         recountPages();
         $("#input").focus(); // focus on input
@@ -125,6 +128,7 @@ $(function (){ // document ready start
 
     function show_completed() { // show completed elements function
         currentTab = "completed";
+        console.log("You are on Completed tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
         recountPages();
         $("#input").focus(); // focus on input
@@ -149,7 +153,7 @@ $(function (){ // document ready start
         }
     }
 
-    function renderLi() {
+    function renderLi() { // renderLi start
         if (currentTab == "all") {
             $("li").show(); // show all li
             if (allLi > 3) { // show only 3 elements on page
@@ -168,24 +172,36 @@ $(function (){ // document ready start
                 $("li").slice(3).hide(); // show only 3 elements on page
             }
         }
-    }
+    }// renderLi end
 
     function recountPages() { // recount pages
-        if (currentTab == "active") {
-            pageCount = Math.ceil(activeLi / 3);
-            // if (activeLi == 3 && pageCount > 1){
-            //     $("#pages button:last-child").remove(); // find and remove last button
-            //     --pageCount; //remove page
-            //     currentPage = 1;
-            // }
-        } else { // currentTab = completed
-            pageCount = Math.ceil(completedLi / 3);
-            // if (completedLi == 3 && pageCount > 1){
-            //     $("#pages button:last-child").remove(); // find and remove last button
-            //     --pageCount; //remove page
-            //     currentPage = 1;
-            // }
+        if (currentTab == "all") {
+            pageCount = Math.ceil(allLi / 3); // pages for this tab
+            console.log("Pages for this tab should be"+" "+pageCount);
+            createPage();
+        } else if (currentTab == "active"){
+            pageCount = Math.ceil(activeLi / 3); // pages for this tab
+            if (pageCount == 0){
+                pageCount = 1;
+            }
+            console.log(pageCount);
+            createPage();
+        } else { // currentTab == completed
+            pageCount = Math.ceil(completedLi / 3); // pages for this tab
+            if (pageCount == 0){
+                pageCount = 1;
+            }
+            console.log(pageCount);
+            createPage();
         }
-    }
+
+    } // recount pages end
+
+    function createPage() { // createPage start
+        $("#pages").empty(); // set pages to 0
+        for (var i=1; i <= pageCount; i++) { // while pages less then needed
+            $("#pages").append($("<button></button>").text(i)); // create page
+        }
+    } // createPage end
 
 }) // document ready end
