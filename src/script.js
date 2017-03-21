@@ -15,18 +15,43 @@ $(function (){ // document ready start
         $("#container").append($("<section id='pagination'></section>"));
         $("#pagination").append($("<button id='prev'><</button>").click(function () { // go to previous page function
             if (currentPage !== 1){ // if current page isn't first we go to next one
-                currentPage = currentPage - 1;
+                --currentPage;
                 console.log("Current page is"+" "+currentPage);
+                start_from = (currentPage - 1) * 3;
+                end_on = start_from + 3;
+                $('li').css('display', 'none');
+                if (currentTab == 'all'){
+                    $('li').slice(start_from, end_on).css('display', '');
+                } else if (currentTab == 'active') {
+                    $('li').not('.completed').slice(start_from, end_on).css('display', '');
+                } else {
+                    $('.completed').slice(start_from, end_on).css('display', '');
+                }
+                console.log("currentPage is"+" "+currentPage);
             }
         }));
         $("#pagination").append($("<section id='pages'></section>"));
         $("#pagination").append($("<button id='next'>></button>").click(function () { // go to next page function
                 if (currentPage !== pageCount){ // if current page isn't last we go to next one
-                    currentPage = currentPage + 1;
+                    ++currentPage;
                     console.log("Current page is"+" "+currentPage);
+                    start_from = (currentPage - 1) * 3;
+                    end_on = start_from + 3;
+                    $('li').css('display', 'none');
+                    if (currentTab == 'all'){
+                        $('li').slice(start_from, end_on).css('display', '');
+                    } else if (currentTab == 'active') {
+                        $('li').not('.completed').slice(start_from, end_on).css('display', '');
+                    } else {
+                        $('.completed').slice(start_from, end_on).css('display', '');
+                    }
+                    console.log("currentPage is"+" "+currentPage);
                 }
+
         }));
-        $("#pages").append($("<button>1</button>"));
+        $("#pages").append($("<button>1</button>").click(
+            goToPage
+        ));
 
 
 
@@ -57,66 +82,66 @@ $(function (){ // document ready start
         if ($("#input")[0].value.trim() !== '') { // if input not empty
             var li = $("<li></li>");       // create li
             if (allLi + 1 > 3 * currentPage) { // if added element is more then 3rd in list
-                li.hide(); // hide element
-            }
-            if (allLi%3 == 0 && allLi !== 0){ // create page when needed
-                if (currentTab == "all" || currentTab == 'active'){ // create page only when not on Completed Tab
-                    $("#pages").append($("<button></button>").text(++pageCount));
+                    li.hide(); // hide element
                 }
-            }
-            li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
-                function () {
-                    var editInput = $("<input />").keypress(function (e) { // add function to input when press ENTER
-                        if (e.keyCode == 13 ) {
-                            $(this).css("display", "none"); // hide input
-                            $(this).siblings("span").text($(this).val()); // insert value of input into span
-                            $(this).siblings().show(); // show other elements
-                        }
-                    }); // create input for edit
-                    li.children().hide(); // hide elements when editInput is opened
-                    li.append($(editInput).val($(this).text())); // insert input into li
-                    $(editInput).focus(); // set value of input same as span
+                if (allLi%3 == 0 && allLi !== 0 && (currentTab == "all" || currentTab == 'active')){ // create page when needed
+                    $("#pages").append($("<button></button>").text(++pageCount).click(//function when click on page number
+                        goToPage
+                    ));// function click on page number end
                 }
-            ));
-            li.prepend($("<input type='checkbox' />").click(function () { // function to sort elements by className
-                       $(this).parent().toggleClass("completed"); // when click on checkbox toggle class for li element
-                        if (currentTab == "all") { // change counters on All Tab
-                            $(this).parent().css("display", "");
-                            if (li[0].className !== 'completed'){
-                                $("#active_counter").text(++activeLi);
-                                $("#completed_counter").text(--completedLi);
+                li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
+                    function () {
+                        var editInput = $("<input />").keypress(function (e) { // add function to input when press ENTER
+                            if (e.keyCode == 13 ) {
+                                $(this).css("display", "none"); // hide input
+                                $(this).siblings("span").text($(this).val()); // insert value of input into span
+                                $(this).siblings().show(); // show other elements
                             }
-                            else {
+                        }); // create input for edit
+                        li.children().hide(); // hide elements when editInput is opened
+                        li.append($(editInput).val($(this).text())); // insert input into li
+                        $(editInput).focus(); // set value of input same as span
+                    }
+                ));
+                li.prepend($("<input type='checkbox' />").click(function () { // function to sort elements by className
+                           $(this).parent().toggleClass("completed"); // when click on checkbox toggle class for li element
+                            if (currentTab == "all") { // change counters on All Tab
+                                $(this).parent().css("display", "");
+                                if (li[0].className !== 'completed'){
+                                    $("#active_counter").text(++activeLi);
+                                    $("#completed_counter").text(--completedLi);
+                                }
+                                else {
+                                    $("#active_counter").text(--activeLi);
+                                    $("#completed_counter").text(++completedLi);
+                                }
+                            } else if (currentTab == "active"){ // change counters on Active Tab
+                                $(this).parent().css("display", "none");
                                 $("#active_counter").text(--activeLi);
                                 $("#completed_counter").text(++completedLi);
+                                renderLi();
+                                recountPages();
+                            } else { // if currentTab=completed change counters on Active Tab
+                                $(this).parent().css("display", "none");
+                                $("#active_counter").text(++activeLi);
+                                $("#completed_counter").text(--completedLi);
+                                renderLi();
+                                recountPages();
                             }
-                        } else if (currentTab == "active"){ // change counters on Active Tab
-                            $(this).parent().css("display", "none");
-                            $("#active_counter").text(--activeLi);
-                            $("#completed_counter").text(++completedLi);
-                            renderLi();
-                            recountPages();
-                        } else { // if currentTab=completed change counters on Active Tab
-                            $(this).parent().css("display", "none");
-                            $("#active_counter").text(++activeLi);
-                            $("#completed_counter").text(--completedLi);
-                            renderLi();
-                            recountPages();
-                        }
-                })
-            );
-            li.append($("<button>x</button>").click(function (event) { // create remov ebutton
-                $(event.target).parent().detach(); // remove li when click remove btn
-                removePage();
-            }));// end remove button
-            $("#list").append(li); // insert created li to list
-            $("#input").val(""); // clear input value
+                    })
+                );
+                li.append($("<button>x</button>").click(function (event) { // create remove button
+                    $(event.target).parent().detach(); // remove li when click remove btn
+                    removePage();// remove page if needed
+                }));// end remove button
+                $("#list").append(li); // insert created li to list
+                $("#input").val(""); // clear input value
+                $("#all_counter").text(++allLi);
+                $("#active_counter").text(++activeLi);
+                if (currentTab == 'completed') { // hide li if current tab is Completed
+                    li.hide();
+                }
         } // end if input not empty
-        $("#all_counter").text(++allLi);
-        $("#active_counter").text(++activeLi);
-        if (currentTab == 'completed') { // hide li if current tab is Completed
-            li.hide();
-        }
         $("#input").focus();
     }// addElement end
 
@@ -217,10 +242,32 @@ $(function (){ // document ready start
     function createPage() { // createPage start
         $("#pages").empty(); // set pages to 0
         for (var i=1; i <= pageCount; i++) { // while pages less then needed
-            $("#pages").append($("<button></button>").text(i)); // create page
+            $("#pages").append($("<button></button>").text(i).click(
+                goToPage
+            )); // create page
         }
     } // createPage end
 
-
+    function goToPage() { // goToPage start
+        currentPage = parseInt($(this).text());
+        console.log("You went to "+currentPage+" page");
+        if (currentPage !== 1){
+            start_from = parseInt(($(this).text() - 1)) * 3;
+            end_on = start_from + 3;
+        } else { // if currentPage = 1
+            start_from = 0;
+            end_on = 3;
+        }
+        $('li').css('display', 'none');
+        if (currentTab == 'all'){
+            $('li').slice(start_from, end_on).css('display', '');
+        } else if (currentTab == 'active') {
+            $('li').not('.completed').slice(start_from, end_on).css('display', '');
+        } else {
+            $('.completed').slice(start_from, end_on).css('display', '');
+        }
+        currentPage = parseInt($(this).text());
+        console.log("currentPage is"+" "+currentPage);
+    } // goToPage end
 
 }) // document ready end
