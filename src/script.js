@@ -199,7 +199,6 @@ $(function (){ // document ready start
             $("#active_counter").text(--activeLi);// decrease active elements counter
         }
         if (currentTab == "all" ) {
-
             if (Math.ceil(allLi / 3) < pageCount && pageCount !== 1) {
                 --pageCount;
                 $("#pages button:last-child").remove(); // find and remove last button
@@ -211,12 +210,28 @@ $(function (){ // document ready start
                 goToPage(currentPage);
             }
         } else if (currentTab == 'active'){
-            $("#active_counter").text(--activeLi); // decrease active elements counter
-            renderLi();
+            if (Math.ceil(activeLi / 3) < pageCount && pageCount !== 1) {
+                --pageCount;
+                $("#pages button:last-child").remove(); // find and remove last button
+            }
+            $(btn).parent().remove(); // remove li
+            if (pageCount < currentPage) { // check if page was last, go to previous
+                goToPage(pageCount);
+            } else {
+                goToPage(currentPage);
+            }
         }
         else if (currentTab == "completed"){
-            $("#completed_counter").text(--completedLi);// decrease completed elements counter
-            renderLi();
+            if (Math.ceil(completedLi / 3) < pageCount && pageCount !== 1) {
+                --pageCount;
+                $("#pages button:last-child").remove(); // find and remove last button
+            }
+            $(btn).parent().remove(); // remove li
+            if (pageCount < currentPage) { // check if page was last, go to previous
+                goToPage(pageCount);
+            } else {
+                goToPage(currentPage);
+            }
         }
     }
 
