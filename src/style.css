@@ -17,3 +17,6 @@
 #pages{
     display: inline-block;
 }
+.active-btn{
+    background-color: coral;
+}

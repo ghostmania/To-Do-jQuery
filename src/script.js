@@ -2,20 +2,38 @@
  * Created by user on 17.03.17.
  */
 $(function (){ // document ready start
-        $("#input").focus(); // focus input when page is loaded
+    $("#input").focus(); // focus input when page is loaded
 
-        var currentTab = "all";
-        var activeLi = 0;
-        var completedLi = 0;
-        var allLi = 0;
-        var currentPage = 1;
-        var pageCount = 1;
-        var actualList =[];
-        //pagination
-        $("#container").append($("<section id='pagination'></section>"));
-        $("#pagination").append($("<button id='prev'><</button>").click(function () { // go to previous page function
-            if (currentPage !== 1){ // if current page isn't first we go to next one
-                --currentPage;
+    var currentTab = "all";
+    var activeLi = 0;
+    var completedLi = 0;
+    var allLi = 0;
+    var currentPage = 1;
+    var pageCount = 1;
+    var actualList =[];
+    //pagination
+    $("#container").append($("<section id='pagination'></section>"));
+    $("#pagination").append($("<button id='prev'><</button>").click(function () { // go to previous page function
+        if (currentPage !== 1){ // if current page isn't first we go to next one
+            --currentPage;
+            console.log("Current page is"+" "+currentPage);
+            start_from = (currentPage - 1) * 3;
+            end_on = start_from + 3;
+            $('li').css('display', 'none');
+            if (currentTab == 'all'){
+                $('li').slice(start_from, end_on).css('display', '');
+            } else if (currentTab == 'active') {
+                $('li').not('.completed').slice(start_from, end_on).css('display', '');
+            } else {
+                $('.completed').slice(start_from, end_on).css('display', '');
+            }
+            console.log("currentPage is"+" "+currentPage);
+        }
+    }));
+    $("#pagination").append($("<section id='pages'></section>"));
+    $("#pagination").append($("<button id='next'>></button>").click(function () { // go to next page function
+            if (currentPage !== pageCount){ // if current page isn't last we go to next one
+                ++currentPage;
                 console.log("Current page is"+" "+currentPage);
                 start_from = (currentPage - 1) * 3;
                 end_on = start_from + 3;
@@ -29,30 +47,19 @@ $(function (){ // document ready start
                 }
                 console.log("currentPage is"+" "+currentPage);
             }
-        }));
-        $("#pagination").append($("<section id='pages'></section>"));
-        $("#pagination").append($("<button id='next'>></button>").click(function () { // go to next page function
-                if (currentPage !== pageCount){ // if current page isn't last we go to next one
-                    ++currentPage;
-                    console.log("Current page is"+" "+currentPage);
-                    start_from = (currentPage - 1) * 3;
-                    end_on = start_from + 3;
-                    $('li').css('display', 'none');
-                    if (currentTab == 'all'){
-                        $('li').slice(start_from, end_on).css('display', '');
-                    } else if (currentTab == 'active') {
-                        $('li').not('.completed').slice(start_from, end_on).css('display', '');
-                    } else {
-                        $('.completed').slice(start_from, end_on).css('display', '');
-                    }
-                    console.log("currentPage is"+" "+currentPage);
-                }
 
-        }));
-        $("#pages").append($("<button>1</button>").click(
-            goToPage
-        ));
+    }));
+    $("#pages").append($("<button>1</button>").click(
+        function () {
+            colorCurrent($("#pages").children(), $(this));
+            goToPage(1)
+        }
+    ));
 
+    function colorCurrent(navBtns, thisBtn) {
+        $(navBtns).removeClass("active-btn");
+        $(thisBtn).addClass("active-btn");
+    }
 
 
     $("#input").keypress(function(e){ // add li when press ENTER
@@ -66,15 +73,25 @@ $(function (){ // document ready start
         );
 
         $("#all_elements").click(
-            show_all
+            function () {
+                show_all();
+                colorCurrent($("#tabs").children(), $(this))
+            }
+
         );
 
         $("#active_elements").click(
-            show_active
+            function () {
+                show_active();
+                colorCurrent($("#tabs").children(), $(this))
+            }
         );
 
         $("#completed_elements").click(
-            show_completed
+            function () {
+                show_completed();
+                colorCurrent($("#tabs").children(), $(this))
+            }
         );
 
 
@@ -86,9 +103,12 @@ $(function (){ // document ready start
                 }
                 if (allLi%3 == 0 && allLi !== 0 && (currentTab == "all" || currentTab == 'active')){ // create page when needed
                     $("#pages").append($("<button></button>").text(++pageCount).click(//function when click on page number
-                        goToPage
-                    ));// function click on page number end
-                }
+                        function () {
+                            colorCurrent($("#pages").children(), $(this));
+                            goToPage(pageCount)
+                        }
+                    )) ;// function click on page number end
+                } // end create page if needed
                 li.append($("<span><span/>").text($("#input").val()).dblclick( // edit function
                     function () {
                         var editInput = $("<input />").keypress(function (e) { // add function to input when press ENTER
@@ -120,19 +140,18 @@ $(function (){ // document ready start
                                 $("#active_counter").text(--activeLi);
                                 $("#completed_counter").text(++completedLi);
                                 renderLi();
-                                recountPages();
+                                recountPage(activeLi);
                             } else { // if currentTab=completed change counters on Active Tab
                                 $(this).parent().css("display", "none");
                                 $("#active_counter").text(++activeLi);
                                 $("#completed_counter").text(--completedLi);
                                 renderLi();
-                                recountPages();
+                                recountPage(completedLi);
                             }
                     })
                 );
                 li.append($("<button>x</button>").click(function (event) { // create remove button
-                    $(event.target).parent().detach(); // remove li when click remove btn
-                    removePage();// remove page if needed
+                    removeLi(this);// remove li
                 }));// end remove button
                 $("#list").append(li); // insert created li to list
                 $("#input").val(""); // clear input value
@@ -150,7 +169,7 @@ $(function (){ // document ready start
         currentPage = 1;
         console.log("You are on All tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
-        recountPages();
+        recountPage(allLi);
         $("#input").focus(); // focus on input
     }
 
@@ -159,7 +178,7 @@ $(function (){ // document ready start
         currentPage = 1;
         console.log("You are on Active tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
-        recountPages();
+        recountPage(activeLi);
         $("#input").focus(); // focus on input
     }
 
@@ -168,15 +187,29 @@ $(function (){ // document ready start
         currentPage = 1;
         console.log("You are on Completed tab and current page is"+" "+currentPage);
         renderLi(); // display elements according to  their status
-        recountPages();
+        recountPage(completedLi);
         $("#input").focus(); // focus on input
     }
 
-    function removePage() {
+    function removeLi(btn) {
         $("#all_counter").text(--allLi); // decrease allCounter
-        if (currentTab == "all") {
-            $("#active_counter").text(--activeLi); // decrease active elements counter
-            renderLi();
+        if ($(btn).parent().hasClass("completed")){
+            $("#completed_counter").text(--completedLi); // decrease completed elements counter
+        } else {
+            $("#active_counter").text(--activeLi);// decrease active elements counter
+        }
+        if (currentTab == "all" ) {
+
+            if (Math.ceil(allLi / 3) < pageCount && pageCount !== 1) {
+                --pageCount;
+                $("#pages button:last-child").remove(); // find and remove last button
+            }
+            $(btn).parent().remove(); // remove li
+            if (pageCount < currentPage) { // check if page was last, go to previous
+                goToPage(pageCount);
+            } else {
+                goToPage(currentPage);
+            }
         } else if (currentTab == 'active'){
             $("#active_counter").text(--activeLi); // decrease active elements counter
             renderLi();
@@ -184,10 +217,6 @@ $(function (){ // document ready start
         else if (currentTab == "completed"){
             $("#completed_counter").text(--completedLi);// decrease completed elements counter
             renderLi();
-        }
-        if (allLi%3 == 0 && allLi !== 0){ // remove page when needed
-            $("#pages button:last-child").remove(); // find and remove last button
-            --pageCount; //remove page
         }
     }
 
@@ -213,51 +242,31 @@ $(function (){ // document ready start
         }
     }// renderLi end
 
-    function recountPages() { // recount pages
-        if (currentTab == "all") {
-            pageCount = Math.ceil(allLi / 3); // pages for this tab
-            if (pageCount == 0){
-                pageCount = 1;
-            }
-            console.log("Pages for this tab should be"+" "+pageCount);
-            createPage();
-        } else if (currentTab == "active"){
-            pageCount = Math.ceil(activeLi / 3); // pages for this tab
-            if (pageCount == 0){
-                pageCount = 1;
-            }
-            console.log("Pages for this tab should be"+" "+pageCount);
-            createPage();
-        } else { // currentTab == completed
-            pageCount = Math.ceil(completedLi / 3); // pages for this tab
-            if (pageCount == 0){
-                pageCount = 1;
-            }
-            console.log("Pages for this tab should be"+" "+pageCount);
-            createPage();
+    function recountPage(li) { // recount pages
+        console.log("1= ", pageCount);
+        pageCount = Math.ceil(li / 3); // pages for this tab
+        console.log("2= ", pageCount);
+        if (pageCount == 0){
+            pageCount = 1;
         }
-
-    } // recount pages end
-
-    function createPage() { // createPage start
+        console.log("Pages for this tab should be"+" "+pageCount);
         $("#pages").empty(); // set pages to 0
         for (var i=1; i <= pageCount; i++) { // while pages less then needed
-            $("#pages").append($("<button></button>").text(i).click(
-                goToPage
+            $("#pages").append($("<button></button>").text(i).click({page:i},
+                function (params) {
+                    goToPage(params.data.page);
+                    colorCurrent($("#pages").children(), $(this))
+                }
+
             )); // create page
         }
-    } // createPage end
+    } // recount pages end
 
-    function goToPage() { // goToPage start
-        currentPage = parseInt($(this).text());
+    function goToPage(param) { // goToPage start
+        param.data ? currentPage = param.data.page : currentPage = param;
         console.log("You went to "+currentPage+" page");
-        if (currentPage !== 1){
-            start_from = parseInt(($(this).text() - 1)) * 3;
-            end_on = start_from + 3;
-        } else { // if currentPage = 1
-            start_from = 0;
-            end_on = 3;
-        }
+        start_from = (currentPage - 1) * 3;
+        end_on = start_from + 3;
         $('li').css('display', 'none');
         if (currentTab == 'all'){
             $('li').slice(start_from, end_on).css('display', '');
@@ -266,7 +275,6 @@ $(function (){ // document ready start
         } else {
             $('.completed').slice(start_from, end_on).css('display', '');
         }
-        currentPage = parseInt($(this).text());
         console.log("currentPage is"+" "+currentPage);
     } // goToPage end
 
