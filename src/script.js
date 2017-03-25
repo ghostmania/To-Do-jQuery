@@ -83,7 +83,8 @@ $(function (){ // document ready start
                 $("#pages").append($("<button></button>").text(++pageCount).click(//function when click on page number
                     function () {
                         colorCurrent($("#pages button"), $(this));
-                        goToPage(pageCount)
+                        // console.log($(this).text());
+                        goToPage($(this).text())
                     }
                 )) ;// function click on page number end
             } // end create page if needed
