@@ -77,13 +77,11 @@ $(function (){ // document ready start
                 li.hide(); // hide element
             }
             if (currentTab == "all" && allLi%3 == 0 && allLi !== 0 || // if currentTab=all
-                currentTab == 'active' && activeLi%3 == 0 && activeLi !== 0  || // if currentTab=active
-                currentTab == 'completed' && completedLi%3 == 0 && completedLi !== 0  // if currentTab=completed
+                currentTab == 'active' && activeLi%3 == 0 && activeLi !== 0
             ){ // create page when needed
                 $("#pages").append($("<button></button>").text(++pageCount).click(//function when click on page number
                     function () {
                         colorCurrent($("#pages button"), $(this));
-                        // console.log($(this).text());
                         goToPage($(this).text())
                     }
                 )) ;// function click on page number end
